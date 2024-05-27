@@ -1,4 +1,3 @@
-# docker-compose.deploy.yml
 version: '3.8'
 
 volumes:
@@ -8,8 +7,7 @@ volumes:
 
 networks:
   micro_network:
-    external:
-      name: micro_network
+    name: micro_network
 
 services:
   user-api:
@@ -22,6 +20,7 @@ services:
       - user-db
     networks:
       - micro_network
+        
     restart: always
 
   user-db:
@@ -36,35 +35,10 @@ services:
       MYSQL_PASSWORD: pfm_2020
     networks:
       - micro_network
+        
     volumes:
     - userdb_vol:/var/lib/mysql
 
-  product-api:
-    container_name: cproduct-service
-    build:
-      context: ../product-service
-    ports:
-    - "5002:5002"
-    depends_on:
-      - product-db
-    networks:
-      - micro_network
-    restart: always
-
-  product-db:
-    container_name: cproduct_dbase
-    image: mysql:8
-    ports:
-    - "32001:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: pfm_dc_2020
-      MYSQL_DATABASE: product
-      MYSQL_USER: cloudacademy
-      MYSQL_PASSWORD: pfm_2020
-    networks:
-      - micro_network
-    volumes:
-    - productdb_vol:/var/lib/mysql
 
   order-api:
     container_name: corder-service
@@ -93,6 +67,36 @@ services:
     volumes:
     - orderdb_vol:/var/lib/mysql
 
+  product-api:
+    container_name: cproduct-service
+    build:
+      context: ../product-service
+    ports:
+    - "5002:5002"
+    depends_on:
+      - product-db
+    networks:
+      - micro_network
+    restart: always
+
+  product-db:
+    container_name: cproduct_dbase
+    image: mysql:8
+    ports:
+    - "32001:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pfm_dc_2020
+      MYSQL_DATABASE: product
+      MYSQL_USER: cloudacademy
+      MYSQL_PASSWORD: pfm_2020
+    networks:
+      - micro_network
+    volumes:
+    - productdb_vol:/var/lib/mysql
+
+
+  # Similar configurations for product-api, product-db, order-api, and order-db...
+
   frontend-app:
     container_name: cfrontend-app
     build:
@@ -101,4 +105,5 @@ services:
     - "5000:5000"
     networks:
       - micro_network
+        
     restart: always
